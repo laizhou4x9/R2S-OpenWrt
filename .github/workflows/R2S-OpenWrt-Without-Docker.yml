@@ -83,10 +83,3 @@ jobs:
         cd openwrt
         let make_process=$(nproc)+1
         make -j${make_process} V=s || make -j${make_process} V=s || make -j1 V=s
-    - name: Cleaning
-      run: |
-        df -h
-        cd openwrt/bin/targets/rockchip/armv8
-        /bin/bash ../../../../../SCRIPTS/05_cleaning.sh
-    - name: Print Disk Space After
-      run: df -h
