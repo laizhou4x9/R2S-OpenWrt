@@ -83,3 +83,26 @@ jobs:
         cd openwrt
         let make_process=$(nproc)+1
         make -j${make_process} V=s || make -j${make_process} V=s || make -j1 V=s
+    - name: Cleaning
+      run: |
+        df -h
+        cd openwrt/bin/targets/rockchip/armv8
+        /bin/bash ../../../../../SCRIPTS/05_cleaning.sh
+    - name: Print Disk Space After
+      run: df -h
+    - name: Assemble Artifact
+      id: assemble_artifact
+      run: |
+        rm -rf ./artifact/
+        mkdir -p ./artifact/
+        cp openwrt/bin/targets/rockchip/armv8/*squashfs-sysupgrade.img.gz ./artifact/
+        cd openwrt
+        cd ..
+        zip -r artifact.zip ./artifact/
+        release_tag="R2S-GC404-$(date +%Y-%m-%d)"
+        echo "##[set-output name=release_tag;]$release_tag"
+    - name: Upload Artifact
+      uses: actions/upload-artifact@master
+      with:
+        name: ${{ steps.assemble_artifact.outputs.release_tag }}-ROM
+        path: ./artifact.zip
